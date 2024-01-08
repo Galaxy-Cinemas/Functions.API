@@ -48,5 +48,17 @@ namespace Galaxi.Functions.API.Controllers
 
             return BadRequest();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(DeleteFunctionCommand id)
+        {
+            var delete = await _mediator.Send(id);
+
+            if (delete)
+                return Ok("removed function");
+
+            return BadRequest();
+
+        }
     }
 }
