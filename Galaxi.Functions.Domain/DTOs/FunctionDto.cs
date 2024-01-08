@@ -1,6 +1,6 @@
-﻿namespace Galaxi.Functions.Data.Models
+﻿namespace Galaxi.Functions.Domain.DTOs
 {
-    public class Function
+    public class FunctionDto
     {
         public int FunctionId { get; set; }
         public int MovieId { get; set; }
