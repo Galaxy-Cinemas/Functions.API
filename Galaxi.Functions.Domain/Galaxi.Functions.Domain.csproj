@@ -6,4 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+    <Folder Include="Handlers\" />
+    <Folder Include="Infrastructure\Commands\" />
+    <Folder Include="Infrastructure\Queries\" />
+    <Folder Include="Profiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Galaxi.Functions.Persistence\Galaxi.Functions.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

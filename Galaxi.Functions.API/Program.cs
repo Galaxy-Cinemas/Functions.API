@@ -1,6 +1,15 @@
+using Microsoft.Extensions.Configuration;
+using Galaxi.Functions.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var service = builder.Services.BuildServiceProvider();
+var configuration = service.GetService<IConfiguration>();
+
+builder.Services.AddInfrastructure(configuration);
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
