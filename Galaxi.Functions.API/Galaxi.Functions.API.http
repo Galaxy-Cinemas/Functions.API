@@ -1,6 +1,6 @@
 @Galaxi.Functions.API_HostAddress = http://localhost:5183
 
-GET {{Galaxi.Functions.API_HostAddress}}/weatherforecast/
+GET {{Galaxi.Functions.API_HostAddress}}/
 Accept: application/json
 
 ###
