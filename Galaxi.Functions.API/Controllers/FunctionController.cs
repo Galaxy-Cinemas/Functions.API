@@ -22,6 +22,7 @@ namespace Galaxi.Functions.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             _log.LogInformation("Get all");
+            //_log.LogWarning("Get all warning");
             var functions = await _mediator.Send(new GetAllFunctionsQuery());
             return Ok(functions);
         }

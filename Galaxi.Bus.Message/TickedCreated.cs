@@ -2,11 +2,11 @@
 {
     public class TickedCreated
     {
-        public TickedCreated(int movietId)
+        public TickedCreated(int functionId)
         {
-            MovietId = movietId;
+            FunctionId = functionId;
         }
 
-        public int MovietId { get; }
+        public int FunctionId { get; }
     }
 }
