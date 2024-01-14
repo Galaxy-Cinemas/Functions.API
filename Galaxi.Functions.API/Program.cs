@@ -17,7 +17,7 @@ var configuration = service.GetService<IConfiguration>();
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<TickedCreatedConsumer>();
+    x.AddConsumer<UpdateFunctionConsumer>();
 
     x.UsingAzureServiceBus((context, cfg) =>
     {

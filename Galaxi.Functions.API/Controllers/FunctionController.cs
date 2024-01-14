@@ -9,16 +9,19 @@ namespace Galaxi.Functions.API.Controllers
     [ApiController]
     public class FunctionController : ControllerBase
     {
+        private readonly ILogger<FunctionController> _log;
         private readonly IMediator _mediator;
 
-        public FunctionController(IMediator mediator)
+        public FunctionController(ILogger<FunctionController> log, IMediator mediator)
         {
+            _log = log;
             _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            _log.LogInformation("Get all");
             var functions = await _mediator.Send(new GetAllFunctionsQuery());
             return Ok(functions);
         }
@@ -26,6 +29,7 @@ namespace Galaxi.Functions.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatedFunctionCommand functionToCreate)
         {
+            
             var created = await _mediator.Send(functionToCreate);
             if (created)
                 return Ok(functionToCreate);
