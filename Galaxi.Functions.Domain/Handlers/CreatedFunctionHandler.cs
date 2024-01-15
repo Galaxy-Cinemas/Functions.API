@@ -4,6 +4,7 @@ using Galaxi.Functions.Domain.DTOs;
 using Galaxi.Functions.Domain.Infrastructure.Commands;
 using Galaxi.Functions.Persistence.Repositorys;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,18 +18,27 @@ namespace Galaxi.Functions.Domain.Handlers
     {
         private readonly IFunctionRepository _repo;
         private readonly IMapper _mapper;
-        public CreatedFunctionHandler(IFunctionRepository repo, IMapper mapper)
+        private readonly ILogger<CreatedFunctionHandler> _log;
+
+        public CreatedFunctionHandler(IFunctionRepository repo, IMapper mapper, ILogger<CreatedFunctionHandler> log)
         {
             _repo = repo;
             _mapper = mapper;
+            _log = log;
         }
         public async Task<bool> Handle(CreatedFunctionCommand request, CancellationToken cancellationToken)
         {
-            var createdMovie = _mapper.Map<Function>(request);
-
-            _repo.Add(createdMovie);
-
-            return await _repo.SaveAll();
+            try
+            {
+                var createdMovie = _mapper.Map<Function>(request);
+                _repo.Add(createdMovie);
+                return await _repo.SaveAll();
+            }
+            catch (Exception ex) 
+            {
+                _log.LogError("An exception occurred, the movie function could not be created {0}", ex.Message);
+                return false;
+            }
         }
     }
 }
