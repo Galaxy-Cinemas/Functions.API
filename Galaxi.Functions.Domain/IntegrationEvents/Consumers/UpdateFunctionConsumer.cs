@@ -35,7 +35,7 @@ namespace Galaxi.Functions.Domain.IntegrationEvents.Consumers
             }
             catch (Exception ex) 
             {
-                _log.LogError("An exception occurred while updating the number of available chairs.");
+                _log.LogError("An exception occurred while updating the number of available chairs. {0}", ex.Message);
             }
         }
     }

@@ -21,10 +21,16 @@ namespace Galaxi.Functions.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            _log.LogInformation("Get all");
-            //_log.LogWarning("Get all warning");
-            var functions = await _mediator.Send(new GetAllFunctionsQuery());
-            return Ok(functions);
+            try
+            {
+                _log.LogInformation("Get all movie functions");
+                var functions = await _mediator.Send(new GetAllFunctionsQuery());
+                return Ok(functions);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
@@ -49,8 +55,11 @@ namespace Galaxi.Functions.API.Controllers
             var functionToUpdate = await _mediator.Send(updateFunction);
 
             if (functionToUpdate)
+            {
+                _log.LogWarning("Movie function has been update, with functionId {0}", id);
                 return Ok(updateFunction);
-
+            }
+            _log.LogWarning("Movie function could not be update, with functionId {0}", id);
             return BadRequest();
         }
 
@@ -60,8 +69,11 @@ namespace Galaxi.Functions.API.Controllers
             var delete = await _mediator.Send(id);
 
             if (delete)
-                return Ok("removed function");
-
+            {
+                _log.LogWarning("Movie function has been removed, with functionId {0}", id);
+                return Ok("removed movie function");
+            }
+            _log.LogWarning("Movie function could not be removed, with functionId {0}", id);
             return BadRequest();
 
         }
