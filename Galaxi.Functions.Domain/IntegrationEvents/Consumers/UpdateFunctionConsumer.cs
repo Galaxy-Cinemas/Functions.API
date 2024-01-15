@@ -18,23 +18,25 @@ namespace Galaxi.Functions.Domain.IntegrationEvents.Consumers
 
         public async Task Consume(ConsumeContext<TickedCreated> context)
         {
-            //_log.LogInformation("Nuevo evento: Se crea un Ticket}.", context.Message.MovietId);
-            _log.LogWarning("Movie Id: {0}", context.Message.MovietId);
-
-            Function tickedCreated = await _repo.GetFunctionById(context.Message.MovietId);
-            if (tickedCreated.NumberOfSeats > 0)
+            _log.LogInformation(" --- new event update available seat");
+            try 
             {
-                tickedCreated.NumberOfSeats--;
+                _log.LogInformation(" --- Function Id: {0}", context.Message.FunctionId);
+                Function tickedCreated = await _repo.GetFunctionById(context.Message.FunctionId);
+                _log.LogInformation(" --- Retrieve movie function from DB");
 
-                _repo.Update(tickedCreated);
-
-                //_log.LogWarning("Numero de sillas disponibles de la funcion actualizada");
+                if (tickedCreated.NumberOfSeats > 0)
+                {
+                    tickedCreated.NumberOfSeats--;
+                    _repo.Update(tickedCreated);
+                }
+                await _repo.SaveAll();
+                _log.LogWarning(" --- Number of chairs available for the updated function");
             }
-
-            //_log.LogWarning("No hay sillas disponibles en la funcion");
-
-            await _repo.SaveAll();
-
+            catch (Exception ex) 
+            {
+                _log.LogError("An exception occurred while updating the number of available chairs. {0}", ex.Message);
+            }
         }
     }
 }

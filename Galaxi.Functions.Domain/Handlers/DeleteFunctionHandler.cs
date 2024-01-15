@@ -1,6 +1,7 @@
 ﻿using Galaxi.Functions.Domain.Infrastructure.Commands;
 using Galaxi.Functions.Persistence.Repositorys;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +14,26 @@ namespace Galaxi.Functions.Domain.Handlers
         : IRequestHandler<DeleteFunctionCommand, bool>
     {
         private readonly IFunctionRepository _repo;
-        public DeleteFunctionHandler(IFunctionRepository repo)
+        private readonly ILogger<CreatedFunctionHandler> _log;
+
+        public DeleteFunctionHandler(IFunctionRepository repo, ILogger<CreatedFunctionHandler> log)
         {
             _repo = repo;
+            _log = log;
         }
         public async Task<bool> Handle(DeleteFunctionCommand request, CancellationToken cancellationToken)
         {
-            var function = await _repo.GetFunctionById(request.functionId);
-            _repo.Delete(function);
-            return await _repo.SaveAll();
+            try
+            {
+                var function = await _repo.GetFunctionById(request.functionId);
+                _repo.Delete(function);
+                return await _repo.SaveAll();
+            }
+            catch (Exception ex)
+            {
+                _log.LogError("An exception occurred, the movie function could not be removed {0}", ex.Message);
+                return false;
+            }
         }
     }
 }
