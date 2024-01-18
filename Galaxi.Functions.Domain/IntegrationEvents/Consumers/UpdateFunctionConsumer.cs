@@ -24,10 +24,14 @@ namespace Galaxi.Functions.Domain.IntegrationEvents.Consumers
                 _log.LogInformation(" --- Function Id: {0}", context.Message.FunctionId);
                 Function tickedCreated = await _repo.GetFunctionById(context.Message.FunctionId);
                 _log.LogInformation(" --- Retrieve movie function from DB");
+                
 
-                if (tickedCreated.NumberOfSeats > 0)
+                if (tickedCreated.NumberOfSeats > context.Message.NumSeat)
                 {
-                    tickedCreated.NumberOfSeats--;
+                    for (int i = 0; i < context.Message.NumSeat; i++)
+                    {
+                        tickedCreated.NumberOfSeats--;
+                    }
                     _repo.Update(tickedCreated);
                 }
                 await _repo.SaveAll();
