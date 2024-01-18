@@ -1,11 +1,14 @@
 ﻿using Galaxi.Functions.Domain.Infrastructure.Commands;
 using Galaxi.Functions.Domain.Infrastructure.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Galaxi.Functions.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("v1/[controller]/[action]")]
     [ApiController]
     public class FunctionController : ControllerBase
     {
@@ -36,7 +39,6 @@ namespace Galaxi.Functions.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatedFunctionCommand functionToCreate)
         {
-            
             var created = await _mediator.Send(functionToCreate);
             if (created)
                 return Ok(functionToCreate);
