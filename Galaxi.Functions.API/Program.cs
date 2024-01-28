@@ -60,11 +60,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+        builder => builder.WithOrigins(new[]
+        {
+                        "http://localhost:4200",
+                        "http://localhost:50928"
+        })
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials());
+});
+
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseCors("CorsPolicy");
+app.UseAuthentication();
 app.UseAuthorization();
 
 ApplyMigration();
