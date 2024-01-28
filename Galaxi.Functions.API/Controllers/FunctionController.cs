@@ -36,6 +36,23 @@ namespace Galaxi.Functions.API.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            try
+            {
+                GetFunctionsByIdQuery functionById = new GetFunctionsByIdQuery(functionId: id);
+
+                _log.LogInformation("Get ticket {0}", id);
+                var function = await _mediator.Send(functionById);
+                return Ok(function);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreatedFunctionCommand functionToCreate)
         {
