@@ -7,6 +7,7 @@ namespace Galaxi.Functions.Persistence.Repositorys
         void Add<T>(T entity) where T : class;
         void Delete<T>(T entity) where T : class;
         Task<Function> GetFunctionById(int id);
+        Task<IEnumerable<Function>> GetFunctionByMovieId(int id);
         Task<IEnumerable<Function>> GetFunctionsAsync();
         Task<bool> SaveAll();
         void Update<T>(T entity) where T : class;

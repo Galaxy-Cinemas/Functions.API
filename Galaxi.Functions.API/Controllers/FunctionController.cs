@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 namespace Galaxi.Functions.API.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("v1/[controller]/[action]")]
+    [Route("v1/[action]")]
     [ApiController]
     public class FunctionController : ControllerBase
     {
@@ -43,7 +43,24 @@ namespace Galaxi.Functions.API.Controllers
             {
                 GetFunctionsByIdQuery functionById = new GetFunctionsByIdQuery(functionId: id);
 
-                _log.LogInformation("Get ticket {0}", id);
+                _log.LogInformation("Get function {0}", id);
+                var function = await _mediator.Send(functionById);
+                return Ok(function);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("{movieId}")]
+        public async Task<IActionResult> GetByMovieId(int movieId)
+        {
+            try
+            {
+                GetFunctionByMovieIdQuery functionById = new GetFunctionByMovieIdQuery(movieId: movieId);
+
+                _log.LogInformation("Get function {0}", movieId);
                 var function = await _mediator.Send(functionById);
                 return Ok(function);
             }
