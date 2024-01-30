@@ -39,6 +39,16 @@ namespace Galaxi.Functions.Persistence.Repositorys
             return function;
         }
 
+        public async Task<IEnumerable<Function>> GetFunctionByMovieId(int id)
+        {
+            var function = await _context.MovieFunction.ToListAsync();
+            if (id != null)
+            {
+                function = function.Where(x => x.MovieId.Equals(id)).ToList();
+            }
+            return function;
+        }
+
         public async Task<IEnumerable<Function>> GetFunctionsAsync()
         {
             var function = await _context.MovieFunction.ToListAsync();
