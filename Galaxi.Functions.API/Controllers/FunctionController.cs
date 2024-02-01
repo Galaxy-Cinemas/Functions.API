@@ -100,14 +100,16 @@ namespace Galaxi.Functions.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(DeleteFunctionCommand id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var delete = await _mediator.Send(id);
+
+            DeleteFunctionCommand functionId = new DeleteFunctionCommand(functionId:id);
+            var delete = await _mediator.Send(functionId);
 
             if (delete)
             {
                 _log.LogWarning("Movie function has been removed, with functionId {0}", id);
-                return Ok("removed movie function");
+                return Ok();
             }
             _log.LogWarning("Movie function could not be removed, with functionId {0}", id);
             return BadRequest();
