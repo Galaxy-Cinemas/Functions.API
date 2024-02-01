@@ -11,6 +11,7 @@ using Galaxi.Functions.Domain.IntegrationEvents.Consumers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Galaxi.Bus.Message;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,10 +22,17 @@ var configuration = service.GetService<IConfiguration>();
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UpdateFunctionConsumer>();
+    x.AddConsumer<CheckFunctionConsumer>();
 
     x.UsingAzureServiceBus((context, cfg) =>
     {
         cfg.Host(configuration.GetConnectionString("AzureServiceBus"));
+
+        // Subscribe to ReduceSeats directly on the topic, instead of configuring a queue
+        cfg.SubscriptionEndpoint<TickedCreated>("reduce-seats-consumer", e =>
+        {
+            e.ConfigureConsumer<UpdateFunctionConsumer>(context);
+        });
 
         cfg.ConfigureEndpoints(context);
     });
