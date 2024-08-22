@@ -18,12 +18,12 @@ namespace Galaxi.Functions.Domain.Handlers
         }
         public async Task<Unit> Handle(DeleteFunctionCommand request, CancellationToken cancellationToken)
         {
-            var existingFunctionMovie = await _repo.GetFunctionById(request.functionId);
+            var existingFunctionMovie = await _repo.GetFunctionByIdAsync(request.functionId);
             if (existingFunctionMovie == null)
             {
                 throw new KeyNotFoundException();
             }
-            _repo.Delete(existingFunctionMovie);
+            await _repo.Delete(existingFunctionMovie);
             var sucess = await _repo.SaveAll();
 
             if (!sucess)

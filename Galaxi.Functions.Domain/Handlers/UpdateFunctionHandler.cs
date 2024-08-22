@@ -22,7 +22,7 @@ namespace Galaxi.Functions.Domain.Handlers
 
         public async Task<Unit> Handle(UpdateFunctionCommand request, CancellationToken cancellationToken)
         {
-            var existingFunctionMovie = await _repo.GetFunctionById(request.FunctionId);
+            var existingFunctionMovie = await _repo.GetFunctionByIdAsync(request.FunctionId);
             if (existingFunctionMovie == null)
             {
                 throw new KeyNotFoundException();

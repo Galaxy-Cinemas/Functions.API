@@ -22,7 +22,7 @@ namespace Galaxi.Functions.Domain.IntegrationEvents.Consumers
             try 
             {
                 _log.LogInformation(" --- Function Id: {0}", context.Message.FunctionId);
-                Function tickedCreated = await _repo.GetFunctionById(context.Message.FunctionId);
+                Function tickedCreated = await _repo.GetFunctionByIdAsync(context.Message.FunctionId);
                 _log.LogInformation(" --- Retrieve movie function from DB");
                 
 

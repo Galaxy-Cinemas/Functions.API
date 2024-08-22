@@ -38,6 +38,11 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+});
+
 builder.Services.AddInfrastructure(configuration);
 builder.Services.AddAutoMapper(typeof(FunctionProfile).Assembly);
 builder.Services.AddScoped<IFunctionRepository, FunctionRepository>();
