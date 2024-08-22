@@ -4,11 +4,13 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Galaxi.Functions.Domain.Response;
+using Galaxi.Functions.Domain.DTOs;
 
 namespace Galaxi.Functions.API.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("v1/[action]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Route("[action]")]
     [ApiController]
     public class FunctionController : ControllerBase
     {
@@ -22,13 +24,15 @@ namespace Galaxi.Functions.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             try
             {
                 _log.LogInformation("Get all movie functions");
                 var functions = await _mediator.Send(new GetAllFunctionsQuery());
-                return Ok(functions);
+                var successResponse = ResponseHandler<IEnumerable<FunctionDto>>.CreateSuccessResponse("Functions retrieved successfully", functions);
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
             catch (Exception ex)
             {
@@ -36,16 +40,16 @@ namespace Galaxi.Functions.API.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("{functionId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetById(int functionId)
         {
             try
             {
-                GetFunctionsByIdQuery functionById = new GetFunctionsByIdQuery(functionId: id);
-
-                _log.LogInformation("Get function {0}", id);
-                var function = await _mediator.Send(functionById);
-                return Ok(function);
+                _log.LogInformation("Get function {0}", functionId);
+                var functionById = await _mediator.Send(new GetFunctionsByIdQuery(functionId));
+                var successResponse = ResponseHandler<FunctionDto>.CreateSuccessResponse("Function by id retrieved successfully", functionById);
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
             catch (Exception ex)
             {
@@ -54,15 +58,16 @@ namespace Galaxi.Functions.API.Controllers
         }
 
         [HttpGet("{movieId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetByMovieId(int movieId)
         {
             try
             {
-                GetFunctionByMovieIdQuery functionById = new GetFunctionByMovieIdQuery(movieId: movieId);
-
                 _log.LogInformation("Get function {0}", movieId);
-                var function = await _mediator.Send(functionById);
-                return Ok(function);
+                var functionByMovieId = await _mediator.Send(new GetFunctionByMovieIdQuery(movieId));
+
+                var successResponse = ResponseHandler<IEnumerable<FunctionDto>>.CreateSuccessResponse("Function by movie id retrieved successfully", functionByMovieId);
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
             catch (Exception ex)
             {
@@ -75,8 +80,10 @@ namespace Galaxi.Functions.API.Controllers
         {
             var created = await _mediator.Send(functionToCreate);
             if (created)
-                return Ok(functionToCreate);
-
+            {
+                var successResponse = ResponseHandler<string>.CreateSuccessResponse("Function created successfully", null);
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
+            }
             return BadRequest();
         }
 
@@ -92,26 +99,26 @@ namespace Galaxi.Functions.API.Controllers
 
             if (functionToUpdate)
             {
-                _log.LogWarning("Movie function has been update, with functionId {0}", id);
-                return Ok(updateFunction);
+                _log.LogWarning("Function has been update, with functionId {0}", id);
+                var successResponse = ResponseHandler<UpdateFunctionCommand>.CreateSuccessResponse("Function updated successfully", updateFunction);
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
-            _log.LogWarning("Movie function could not be update, with functionId {0}", id);
+            _log.LogWarning("Function could not be update, with functionId {0}", id);
             return BadRequest();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{functionId}")]
+        public async Task<IActionResult> Delete(int functionId)
         {
-
-            DeleteFunctionCommand functionId = new DeleteFunctionCommand(functionId:id);
-            var delete = await _mediator.Send(functionId);
+            var delete = await _mediator.Send(new DeleteFunctionCommand(functionId));
 
             if (delete)
             {
-                _log.LogWarning("Movie function has been removed, with functionId {0}", id);
-                return Ok();
+                var successResponse = ResponseHandler<string>.CreateSuccessResponse("Function deleted successfully", null);
+                _log.LogInformation("Function deleted successfully");
+                return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
-            _log.LogWarning("Movie function could not be removed, with functionId {0}", id);
+            _log.LogWarning("Function could not be removed, with functionId {0}", functionId);
             return BadRequest();
 
         }
