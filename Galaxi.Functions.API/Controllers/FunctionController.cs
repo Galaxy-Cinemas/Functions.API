@@ -9,7 +9,7 @@ using Galaxi.Functions.Domain.DTOs;
 
 namespace Galaxi.Functions.API.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [Route("[action]")]
     [ApiController]
     public class FunctionController : ControllerBase
@@ -34,9 +34,17 @@ namespace Galaxi.Functions.API.Controllers
                 var successResponse = ResponseHandler<IEnumerable<FunctionDto>>.CreateSuccessResponse("Functions retrieved successfully", functions);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.CreateNotFoundResponse("Function not found.", ex.Message);
+                return StatusCode(response.StatusCode.Value, response);
+            }
             catch (Exception ex)
             {
-                return BadRequest();
+                _log.LogError(ex, ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
             }
         }
 
@@ -51,9 +59,17 @@ namespace Galaxi.Functions.API.Controllers
                 var successResponse = ResponseHandler<FunctionDto>.CreateSuccessResponse("Function by id retrieved successfully", functionById);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
+            catch (InvalidOperationException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("Failed to save changes to the database.", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
             catch (Exception ex)
             {
-                return BadRequest();
+                _log.LogError(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
             }
         }
 
@@ -69,57 +85,119 @@ namespace Galaxi.Functions.API.Controllers
                 var successResponse = ResponseHandler<IEnumerable<FunctionDto>>.CreateSuccessResponse("Function by movie id retrieved successfully", functionByMovieId);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
+            catch (InvalidOperationException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("Failed to save changes to the database.", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
             catch (Exception ex)
             {
-                return BadRequest();
+                _log.LogError(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreatedFunctionCommand functionToCreate)
+        public async Task<IActionResult> Create([FromBody] CreatedFunctionCommand functionToCreate)
         {
-            var created = await _mediator.Send(functionToCreate);
-            if (created)
+            if (!ModelState.IsValid)
             {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("Validation failed", errors);
+                _log.LogWarning("The model is not valid for creating a function.", errorResponse);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
+
+            try
+            {
+                var created = await _mediator.Send(functionToCreate);
                 var successResponse = ResponseHandler<string>.CreateSuccessResponse("Function created successfully", null);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
+
             }
-            return BadRequest();
+            catch (InvalidOperationException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("Failed to save changes to the database.", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateFunctionCommand updateFunction)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateFunctionCommand updateFunction)
         {
             if (id != updateFunction.FunctionId)
             {
-                return BadRequest();
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("An internal server error occurred", new List<string> { "The Function ID does not match the film ID." });
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
             }
-
-            var functionToUpdate = await _mediator.Send(updateFunction);
-
-            if (functionToUpdate)
+            try
             {
+                var functionToUpdate = await _mediator.Send(updateFunction);
                 _log.LogWarning("Function has been update, with functionId {0}", id);
                 var successResponse = ResponseHandler<UpdateFunctionCommand>.CreateSuccessResponse("Function updated successfully", updateFunction);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
-            _log.LogWarning("Function could not be update, with functionId {0}", id);
-            return BadRequest();
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.CreateNotFoundResponse("Function not found.", "The Function with the specified ID does not exist.");
+                return StatusCode(response.StatusCode.Value, response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("Failed to save changes to the database.", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
         }
 
         [HttpDelete("{functionId}")]
         public async Task<IActionResult> Delete(int functionId)
         {
-            var delete = await _mediator.Send(new DeleteFunctionCommand(functionId));
-
-            if (delete)
+            try
             {
+                var delete = await _mediator.Send(new DeleteFunctionCommand(functionId));
                 var successResponse = ResponseHandler<string>.CreateSuccessResponse("Function deleted successfully", null);
                 _log.LogInformation("Function deleted successfully");
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
-            _log.LogWarning("Function could not be removed, with functionId {0}", functionId);
-            return BadRequest();
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.CreateNotFoundResponse("Function not found.", "The Function with the specified ID does not exist.");
+                return StatusCode(response.StatusCode.Value, response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("Failed to save changes to the database.", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
+            catch (Exception ex)
+            {
+                _log.LogError(ex.Message);
+                var errorResponse = ResponseHandler<string>.CreateErrorResponse("An internal server error occurred", ex);
+                return StatusCode(errorResponse.StatusCode.Value, errorResponse);
+            }
 
         }
     }

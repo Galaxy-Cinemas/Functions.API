@@ -1,19 +1,13 @@
 ﻿using AutoMapper;
-using Galaxi.Functions.Data.Models;
 using Galaxi.Functions.Domain.Infrastructure.Commands;
 using Galaxi.Functions.Persistence.Repositorys;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Galaxi.Functions.Domain.Handlers
 {
     public class UpdateFunctionHandler
-        : IRequestHandler<UpdateFunctionCommand, bool>
+        : IRequestHandler<UpdateFunctionCommand, Unit>
     {
         private readonly IFunctionRepository _repo;
         private readonly IMapper _mapper;
@@ -26,20 +20,23 @@ namespace Galaxi.Functions.Domain.Handlers
             _log = log;
         }
 
-        public async Task<bool> Handle(UpdateFunctionCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(UpdateFunctionCommand request, CancellationToken cancellationToken)
         {
-            try
+            var existingFunctionMovie = await _repo.GetFunctionById(request.FunctionId);
+            if (existingFunctionMovie == null)
             {
-                var updateFunction = _mapper.Map<Function>(request);
-                _repo.Update(updateFunction);
-                return await _repo.SaveAll();
+                throw new KeyNotFoundException();
             }
-            catch (Exception ex)
+            _mapper.Map(request, existingFunctionMovie);
+            _repo.Update(existingFunctionMovie);
+
+            var sucess = await _repo.SaveAll();
+            if (!sucess)
             {
-                _log.LogError("An exception occurred, the movie function could not be updated {0}", ex.Message);
-                return false;
+                throw new InvalidOperationException();
             }
-          
+
+            return Unit.Value;
         }
     }
 }
