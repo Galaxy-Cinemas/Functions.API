@@ -23,7 +23,7 @@ namespace Galaxi.Functions.Domain.Handlers
 
         public async Task<IEnumerable<FunctionDto>> Handle(GetFunctionByMovieIdQuery request, CancellationToken cancellationToken)
         {
-            var functionByMovieId = await _repo.GetFunctionByMovieId(request.movieId);
+            var functionByMovieId = await _repo.GetFunctionByMovieIdAsync(request.movieId);
             if (functionByMovieId == null)
             {
                 throw new KeyNotFoundException();

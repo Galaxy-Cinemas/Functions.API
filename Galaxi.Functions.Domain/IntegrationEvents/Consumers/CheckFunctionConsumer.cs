@@ -24,7 +24,7 @@ namespace Galaxi.Functions.Domain.IntegrationEvents.Consumers
         }
         public async Task Consume(ConsumeContext<CheckFunctionSeats> context)
         {
-            Function function = await _repo.GetFunctionById(context.Message.FunctionId);
+            Function function = await _repo.GetFunctionByIdAsync(context.Message.FunctionId);
 
             var exist = function != null;
             var seats = exist ? function.NumberOfSeats : 0;

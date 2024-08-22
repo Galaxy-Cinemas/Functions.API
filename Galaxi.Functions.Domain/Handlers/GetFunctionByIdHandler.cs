@@ -24,7 +24,7 @@ namespace Galaxi.Functions.Domain.Handlers
 
         public async Task<FunctionDto> Handle(GetFunctionsByIdQuery request, CancellationToken cancellationToken)
         {
-            Function functionById = await _repo.GetFunctionById(request.functionId);
+            Function functionById = await _repo.GetFunctionByIdAsync(request.functionId);
             if (functionById == null)
             {
                 throw new KeyNotFoundException();

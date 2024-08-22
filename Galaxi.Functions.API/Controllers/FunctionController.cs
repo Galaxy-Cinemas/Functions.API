@@ -9,7 +9,7 @@ using Galaxi.Functions.Domain.DTOs;
 
 namespace Galaxi.Functions.API.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [Route("[action]")]
     [ApiController]
     public class FunctionController : ControllerBase
