@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
 using Galaxi.Functions.Data.Models;
-using Galaxi.Functions.Domain.DTOs;
 using Galaxi.Functions.Domain.Infrastructure.Commands;
 using Galaxi.Functions.Persistence.Repositorys;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Galaxi.Functions.Domain.Handlers
 {
@@ -28,17 +22,15 @@ namespace Galaxi.Functions.Domain.Handlers
         }
         public async Task<bool> Handle(CreatedFunctionCommand request, CancellationToken cancellationToken)
         {
-            try
+            var createdFunctionMovie = _mapper.Map<Function>(request);
+            _repo.Add(createdFunctionMovie);
+
+            var sucess = await _repo.SaveAll();
+            if (!sucess)
             {
-                var createdMovie = _mapper.Map<Function>(request);
-                _repo.Add(createdMovie);
-                return await _repo.SaveAll();
+                throw new InvalidOperationException();
             }
-            catch (Exception ex) 
-            {
-                _log.LogError("An exception occurred, the movie function could not be created {0}", ex.Message);
-                return false;
-            }
+            return sucess;
         }
     }
 }

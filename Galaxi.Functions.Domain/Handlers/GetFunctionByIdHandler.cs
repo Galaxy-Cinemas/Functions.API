@@ -5,11 +5,6 @@ using Galaxi.Functions.Domain.Infrastructure.Queries;
 using Galaxi.Functions.Persistence.Repositorys;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Galaxi.Functions.Domain.Handlers
 {
@@ -29,17 +24,13 @@ namespace Galaxi.Functions.Domain.Handlers
 
         public async Task<FunctionDto> Handle(GetFunctionsByIdQuery request, CancellationToken cancellationToken)
         {
-            try
+            Function functionById = await _repo.GetFunctionById(request.functionId);
+            if (functionById == null)
             {
-                Function functionById = await _repo.GetFunctionById(request.functionId);
-                var functionByIdViewModel = _mapper.Map<FunctionDto>(functionById);
-                return functionByIdViewModel;
+                throw new KeyNotFoundException();
             }
-            catch (Exception ex)
-            {
-                _log.LogError("An exception has occurred getting the movie function {0}", ex.Message);
-                throw;
-            }
+            var functionByIdViewModel = _mapper.Map<FunctionDto>(functionById);
+            return functionByIdViewModel;
         }
     }
 }

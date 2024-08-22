@@ -22,17 +22,13 @@ namespace Galaxi.Functions.Domain.Handlers
         }
         public async Task<IEnumerable<FunctionDto>> Handle(GetAllFunctionsQuery request, CancellationToken cancellationToken)
         {
-            try
+            var function = await _repo.GetFunctionsAsync();
+            if (function == null || !function.Any())
             {
-                var function = await _repo.GetFunctionsAsync();
-                var functionViewModel = _mapper.Map<List<FunctionDto>>(function);
-                return functionViewModel;
+                throw new KeyNotFoundException();
             }
-            catch (Exception ex)
-            {
-                _log.LogError("An exception has occurred getting all movies {0}", ex.Message);
-                throw;
-            }
+            var functionViewModel = _mapper.Map<List<FunctionDto>>(function);
+            return functionViewModel;
         }
     }
 }
