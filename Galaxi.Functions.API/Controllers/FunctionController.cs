@@ -29,7 +29,7 @@ namespace Galaxi.Functions.API.Controllers
         {
             try
             {
-                _log.LogInformation("Get all movie functions");
+                _log.LogInformation("Get all functions");
                 var functions = await _mediator.Send(new GetAllFunctionsQuery());
                 var successResponse = ResponseHandler<IEnumerable<FunctionDto>>.CreateSuccessResponse("Functions retrieved successfully", functions);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
@@ -79,7 +79,7 @@ namespace Galaxi.Functions.API.Controllers
         {
             try
             {
-                _log.LogInformation("Get function {0}", movieId);
+                _log.LogInformation("Get function by movie Id{0}", movieId);
                 var functionByMovieId = await _mediator.Send(new GetFunctionByMovieIdQuery(movieId));
 
                 var successResponse = ResponseHandler<IEnumerable<FunctionDto>>.CreateSuccessResponse("Function by movie id retrieved successfully", functionByMovieId);
