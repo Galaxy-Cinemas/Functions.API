@@ -16,4 +16,14 @@
         public bool Exist { get; init; }
         public int NumSeatAvailable { get; init; }
     }
+
+    public record CheckAvailableMovie
+    {
+        public Guid MovieId { get; init; }
+    }
+
+    public record MovieStatus
+    {
+        public bool Exist { get; init; }
+    }
 }
