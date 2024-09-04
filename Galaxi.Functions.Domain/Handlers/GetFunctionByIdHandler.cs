@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Galaxi.Functions.Domain.Handlers
 {
     public class GetFunctionByIdHandler
-         : IRequestHandler<GetFunctionsByIdQuery, FunctionDto>
+         : IRequestHandler<GetFunctionsByIdQuery, FunctionDetailsDto>
     {
         private readonly IFunctionRepository _repo;
         private readonly IMapper _mapper;
@@ -22,14 +22,14 @@ namespace Galaxi.Functions.Domain.Handlers
             _log = log;
         }
 
-        public async Task<FunctionDto> Handle(GetFunctionsByIdQuery request, CancellationToken cancellationToken)
+        public async Task<FunctionDetailsDto> Handle(GetFunctionsByIdQuery request, CancellationToken cancellationToken)
         {
             Function functionById = await _repo.GetFunctionByIdAsync(request.functionId);
             if (functionById == null)
             {
                 throw new KeyNotFoundException();
             }
-            var functionByIdViewModel = _mapper.Map<FunctionDto>(functionById);
+            var functionByIdViewModel = _mapper.Map<FunctionDetailsDto>(functionById);
             return functionByIdViewModel;
         }
     }

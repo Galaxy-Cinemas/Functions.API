@@ -1,14 +1,8 @@
 ﻿using Galaxi.Bus.Message;
 using Galaxi.Functions.Data.Models;
-using Galaxi.Functions.Domain.DTOs;
 using Galaxi.Functions.Persistence.Repositorys;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Galaxi.Functions.Domain.IntegrationEvents.Consumers
 {

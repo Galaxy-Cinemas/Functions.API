@@ -9,9 +9,12 @@ namespace Galaxi.Functions.Domain.Profiles
     {
         public FunctionProfile()
         {
-            CreateMap<Function, FunctionDto>();
+            CreateMap<Function, FunctionDetailsDto>();
+            CreateMap<Function, FunctionSummaryDto>();
+
             CreateMap<CreatedFunctionCommand, Function>();
             CreateMap<UpdateFunctionCommand, Function>();
+
         }
     }
 }

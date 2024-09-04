@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Galaxi.Functions.Data.Models;
+using Galaxi.Functions.Domain.DTOs;
 using Galaxi.Functions.Domain.Infrastructure.Commands;
 using Galaxi.Functions.Persistence.Repositorys;
 using MediatR;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Galaxi.Functions.Domain.Handlers
 {
     public class CreatedFunctionHandler
-         : IRequestHandler<CreatedFunctionCommand, bool>
+         : IRequestHandler<CreatedFunctionCommand, FunctionSummaryDto>
     {
         private readonly IFunctionRepository _repo;
         private readonly IMapper _mapper;
@@ -20,7 +21,7 @@ namespace Galaxi.Functions.Domain.Handlers
             _mapper = mapper;
             _log = log;
         }
-        public async Task<bool> Handle(CreatedFunctionCommand request, CancellationToken cancellationToken)
+        public async Task<FunctionSummaryDto> Handle(CreatedFunctionCommand request, CancellationToken cancellationToken)
         {
             var createdFunctionMovie = _mapper.Map<Function>(request);
             _repo.Add(createdFunctionMovie);
@@ -30,7 +31,8 @@ namespace Galaxi.Functions.Domain.Handlers
             {
                 throw new InvalidOperationException();
             }
-            return sucess;
+            var functionCreated = _mapper.Map<FunctionSummaryDto>(createdFunctionMovie);
+            return functionCreated;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Galaxi.Functions.Persistence.Repositorys
             await RemoveCacheAsync(function.FunctionId, function.MovieId);
         }
 
-        public async Task<Function> GetFunctionByIdAsync(int functionId)
+        public async Task<Function> GetFunctionByIdAsync(Guid functionId)
         {
             var cacheKey = $"{_cacheKeyFunction}{functionId}";
 
@@ -61,7 +61,7 @@ namespace Galaxi.Functions.Persistence.Repositorys
             return function;
         }
 
-        public async Task<IEnumerable<Function>> GetFunctionByMovieIdAsync(int movieId)
+        public async Task<IEnumerable<Function>> GetFunctionByMovieIdAsync(Guid movieId)
         {
             var cacheKey = $"{_cacheKeyFunctionByMovieId}{movieId}";
 
@@ -144,7 +144,7 @@ namespace Galaxi.Functions.Persistence.Repositorys
             return null;
         }
 
-        private async Task RemoveCacheAsync(int? filmId = null, int? movieId = null)
+        private async Task RemoveCacheAsync(Guid? filmId = null, Guid? movieId = null)
         {
             try
             {
