@@ -31,7 +31,7 @@ namespace Galaxi.Functions.API.Controllers
             {
                 _log.LogInformation("Get all functions");
                 var functions = await _mediator.Send(new GetAllFunctionsQuery());
-                var successResponse = ResponseHandler<IEnumerable<FunctionDto>>.CreateSuccessResponse("Functions retrieved successfully", functions);
+                var successResponse = ResponseHandler<IEnumerable<FunctionSummaryDto>>.CreateSuccessResponse("Functions retrieved successfully", functions);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
             }
             catch (KeyNotFoundException ex)
@@ -50,14 +50,20 @@ namespace Galaxi.Functions.API.Controllers
 
         [HttpGet("{functionId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetById(int functionId)
+        public async Task<IActionResult> GetById(Guid functionId)
         {
             try
             {
                 _log.LogInformation("Get function {0}", functionId);
                 var functionById = await _mediator.Send(new GetFunctionsByIdQuery(functionId));
-                var successResponse = ResponseHandler<FunctionDto>.CreateSuccessResponse("Function by id retrieved successfully", functionById);
+                var successResponse = ResponseHandler<FunctionDetailsDto>.CreateSuccessResponse("Function by id retrieved successfully", functionById);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.CreateNotFoundResponse("Function not found.", "The Function with the specified ID does not exist.");
+                return StatusCode(response.StatusCode.Value, response);
             }
             catch (InvalidOperationException ex)
             {
@@ -75,15 +81,21 @@ namespace Galaxi.Functions.API.Controllers
 
         [HttpGet("{movieId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetByMovieId(int movieId)
+        public async Task<IActionResult> GetByMovieId(Guid movieId)
         {
             try
             {
                 _log.LogInformation("Get function by movie Id{0}", movieId);
                 var functionByMovieId = await _mediator.Send(new GetFunctionByMovieIdQuery(movieId));
 
-                var successResponse = ResponseHandler<IEnumerable<FunctionDto>>.CreateSuccessResponse("Function by movie id retrieved successfully", functionByMovieId);
+                var successResponse = ResponseHandler<IEnumerable<FunctionSummaryDto>>.CreateSuccessResponse("Function by movie id retrieved successfully", functionByMovieId);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.CreateNotFoundResponse("Function not found.", "The Function with the specified ID does not exist.");
+                return StatusCode(response.StatusCode.Value, response);
             }
             catch (InvalidOperationException ex)
             {
@@ -116,8 +128,8 @@ namespace Galaxi.Functions.API.Controllers
 
             try
             {
-                var created = await _mediator.Send(functionToCreate);
-                var successResponse = ResponseHandler<string>.CreateSuccessResponse("Function created successfully", null);
+                var functionCreated = await _mediator.Send(functionToCreate);
+                var successResponse = ResponseHandler<FunctionSummaryDto>.CreateSuccessResponse("Function created successfully", functionCreated);
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
 
             }
@@ -136,7 +148,7 @@ namespace Galaxi.Functions.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateFunctionCommand updateFunction)
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateFunctionCommand updateFunction)
         {
             if (id != updateFunction.FunctionId)
             {
@@ -171,7 +183,7 @@ namespace Galaxi.Functions.API.Controllers
         }
 
         [HttpDelete("{functionId}")]
-        public async Task<IActionResult> Delete(int functionId)
+        public async Task<IActionResult> Delete(Guid functionId)
         {
             try
             {

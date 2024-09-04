@@ -1,9 +1,9 @@
 ﻿namespace Galaxi.Functions.Domain.DTOs
 {
-    public class FunctionDto
+    public class FunctionDetailsDto
     {
-        public int FunctionId { get; set; }
-        public int MovieId { get; set; }
+        public Guid FunctionId { get; set; }
+        public Guid MovieId { get; set; }
         public Decimal Price { get; set; }
         public DateTime FunctionDate { get; set; }
         public int Room { get; set; }

@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Galaxi.Functions.Domain.Infrastructure.Queries
 {
-    public record GetFunctionsByIdQuery(int functionId) : IRequest<FunctionDto>;
+    public record GetFunctionsByIdQuery(Guid functionId) : IRequest<FunctionDetailsDto>;
 }

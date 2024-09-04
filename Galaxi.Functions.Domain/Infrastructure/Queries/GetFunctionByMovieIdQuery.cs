@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 
 namespace Galaxi.Functions.Domain.Infrastructure.Queries
 {
-    public record GetFunctionByMovieIdQuery(int movieId) : IRequest<IEnumerable<FunctionDto>>;
+    public record GetFunctionByMovieIdQuery(Guid movieId) : IRequest<IEnumerable<FunctionSummaryDto>>;
 
 }

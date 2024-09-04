@@ -2,13 +2,13 @@
 {
     public record TickedCreated
     {
-        public int FunctionId { get; init; }
+        public Guid FunctionId { get; init; }
         public int NumSeat { get; init; }
         public string Email { get; init; }
     }
     public record CheckFunctionSeats
     {
-        public int FunctionId { get; init; }
+        public Guid FunctionId { get; init; }
     }
 
     public record FunctionStatusSeats

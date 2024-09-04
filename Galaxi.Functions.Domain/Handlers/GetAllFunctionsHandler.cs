@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Galaxi.Functions.Domain.Handlers
 {
     internal class GetAllFunctionsHandler
-        : IRequestHandler<GetAllFunctionsQuery, IEnumerable<FunctionDto>>
+        : IRequestHandler<GetAllFunctionsQuery, IEnumerable<FunctionSummaryDto>>
     {
         private readonly IFunctionRepository _repo;
         private readonly IMapper _mapper;
@@ -20,14 +20,14 @@ namespace Galaxi.Functions.Domain.Handlers
             _mapper = mapper;
             _log = log;
         }
-        public async Task<IEnumerable<FunctionDto>> Handle(GetAllFunctionsQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<FunctionSummaryDto>> Handle(GetAllFunctionsQuery request, CancellationToken cancellationToken)
         {
             var function = await _repo.GetFunctionsAsync();
             if (function == null || !function.Any())
             {
                 throw new KeyNotFoundException();
             }
-            var functionViewModel = _mapper.Map<List<FunctionDto>>(function);
+            var functionViewModel = _mapper.Map<List<FunctionSummaryDto>>(function);
             return functionViewModel;
         }
     }
