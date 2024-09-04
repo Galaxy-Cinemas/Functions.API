@@ -14,6 +14,9 @@ using Galaxi.Bus.Message;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
 using Serilog;
+using FluentValidation;
+using Galaxi.Functions.Domain.IntegrationEvents.Validators;
+using Galaxi.Functions.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +52,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UpdateFunctionConsumer>();
     x.AddConsumer<CheckFunctionConsumer>();
+    x.AddRequestClient<CheckAvailableMovie>();
 
     x.UsingAzureServiceBus((context, cfg) =>
     {
@@ -71,8 +75,10 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 builder.Services.AddInfrastructure(configuration);
 builder.Services.AddAutoMapper(typeof(FunctionProfile).Assembly);
-builder.Services.AddScoped<IFunctionRepository, FunctionRepository>();
 builder.Services.AddMediatR(Assembly.Load("Galaxi.Functions.Domain"));
+
+builder.Services.AddScoped<IFunctionRepository, FunctionRepository>();
+builder.Services.AddScoped<IValidator<Function>, ValidatorAvailableMovie>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

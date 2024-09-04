@@ -133,6 +133,12 @@ namespace Galaxi.Functions.API.Controllers
                 return StatusCode(successResponse.StatusCode.Value, successResponse);
 
             }
+            catch (KeyNotFoundException ex)
+            {
+                _log.LogWarning(ex.Message);
+                var response = ResponseHandler<string>.CreateNotFoundResponse("Movie not found.", "The Movie with the specified ID does not exist.");
+                return StatusCode(response.StatusCode.Value, response);
+            }
             catch (InvalidOperationException ex)
             {
                 _log.LogWarning(ex.Message);
