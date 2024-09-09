@@ -5,7 +5,9 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StackExchange.Redis;
-
+using Polly;
+using Polly.CircuitBreaker;
+using Polly.Timeout;
 
 namespace Galaxi.Functions.Persistence.Repositorys
 {
@@ -47,7 +49,12 @@ namespace Galaxi.Functions.Persistence.Repositorys
         {
             var cacheKey = $"{_cacheKeyFunction}{functionId}";
 
-            var cacheFunction = await GetCacheAsync<Function>(cacheKey);
+
+            Function cacheFunction = null;
+
+            cacheFunction = await GetCacheAsync<Function>(cacheKey);
+            
+
             if (cacheFunction != null)
             {
                 return cacheFunction;
@@ -108,13 +115,17 @@ namespace Galaxi.Functions.Persistence.Repositorys
         {
             try
             {
-                await _cache.SetStringAsync
-                             (cacheKey, JsonConvert.SerializeObject(entity),
-                               new DistributedCacheEntryOptions
-                               {
-                                   AbsoluteExpirationRelativeToNow = _cacheExpiration
-                               }
-                             );
+                await Policy.TimeoutAsync(TimeSpan.FromMilliseconds(600), TimeoutStrategy.Pessimistic).ExecuteAsync(async () =>
+                
+                {
+                    await _cache.SetStringAsync
+                            (cacheKey, JsonConvert.SerializeObject(entity),
+                              new DistributedCacheEntryOptions
+                              {
+                                  AbsoluteExpirationRelativeToNow = _cacheExpiration
+                              }
+                            );
+                });
             }
             catch (Exception ex)
             {
@@ -127,7 +138,13 @@ namespace Galaxi.Functions.Persistence.Repositorys
         {
             try
             {
-                var cachedData = await _cache.GetStringAsync(cacheKey);
+                string cachedData = null;
+
+                await Policy.TimeoutAsync(TimeSpan.FromMilliseconds(600), TimeoutStrategy.Pessimistic).ExecuteAsync(async () =>
+                {
+                    cachedData = await _cache.GetStringAsync(cacheKey);
+                });
+
                 if (!string.IsNullOrEmpty(cachedData))
                 {
                     return JsonConvert.DeserializeObject<T>(cachedData);
@@ -148,11 +165,14 @@ namespace Galaxi.Functions.Persistence.Repositorys
         {
             try
             {
-                await Task.WhenAll(
-                        _cache.RemoveAsync($"{_cacheKeyFunction}{filmId}"),
-                        _cache.RemoveAsync($"{_cacheKeyFunctionByMovieId}{movieId}"),
-                        _cache.RemoveAsync(_cacheKeyAllFunctions)
-                    );
+                await Policy.TimeoutAsync(TimeSpan.FromSeconds(2), TimeoutStrategy.Pessimistic).ExecuteAsync(async () =>
+                {
+                    await Task.WhenAll(
+                       _cache.RemoveAsync($"{_cacheKeyFunction}{filmId}"),
+                       _cache.RemoveAsync($"{_cacheKeyFunctionByMovieId}{movieId}"),
+                       _cache.RemoveAsync(_cacheKeyAllFunctions)
+                   );
+                });
             }
             catch (RedisException ex)
             {
