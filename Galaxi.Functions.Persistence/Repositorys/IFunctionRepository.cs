@@ -11,5 +11,6 @@ namespace Galaxi.Functions.Persistence.Repositorys
         Task<IEnumerable<Function>> GetFunctionByMovieIdAsync(Guid id);
         Task<IEnumerable<Function>> GetFunctionsAsync();
         Task<bool> SaveAll();
+        Task MigrateAsync();
     }
 }
