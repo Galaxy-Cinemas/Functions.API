@@ -127,7 +127,7 @@ app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-ApplyMigration();
+//ApplyMigration();
 
 app.MapControllers();
 

@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Galaxi.Functions.Domain.Response;
 using Galaxi.Functions.Domain.DTOs;
+using Galaxi.Functions.Persistence.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Galaxi.Functions.Persistence.Repositorys;
+using System.Runtime.InteropServices;
 
 namespace Galaxi.Functions.API.Controllers
 {
@@ -14,16 +18,27 @@ namespace Galaxi.Functions.API.Controllers
     [ApiController]
     public class FunctionController : ControllerBase
     {
+        private readonly IFunctionRepository _repo;
         private readonly ILogger<FunctionController> _log;
         private readonly IMediator _mediator;
 
-        public FunctionController(ILogger<FunctionController> log, IMediator mediator)
+        public FunctionController(IFunctionRepository repo, ILogger<FunctionController> log, IMediator mediator)
         {
+            _repo = repo;
             _log = log;
             _mediator = mediator;
         }
 
-        [HttpGet]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> migrate()
+        {
+            await _repo.MigrateAsync();
+            var successResponse = ResponseHandler<string>.CreateSuccessResponse("DB has been migrated successfully", null);
+            return StatusCode(successResponse.StatusCode.Value, successResponse);
+        }
+
+            [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {

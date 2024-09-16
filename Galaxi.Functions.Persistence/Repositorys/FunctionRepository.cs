@@ -110,6 +110,10 @@ namespace Galaxi.Functions.Persistence.Repositorys
         {
             return await _context.SaveChangesAsync() > 0;
         }
+        public async Task MigrateAsync()
+        {
+            await _context.Database.MigrateAsync();
+        }
 
         private async Task SetCacheAsync<T>(T entity, string cacheKey)
         {
@@ -133,7 +137,6 @@ namespace Galaxi.Functions.Persistence.Repositorys
             }
 
         }
-
         private async Task<T> GetCacheAsync<T>(string cacheKey) where T : class
         {
             try
@@ -160,7 +163,6 @@ namespace Galaxi.Functions.Persistence.Repositorys
             }
             return null;
         }
-
         private async Task RemoveCacheAsync(Guid? filmId = null, Guid? movieId = null)
         {
             try
